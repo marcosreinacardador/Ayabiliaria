@@ -163,6 +163,10 @@ public class Propiedad {
 		this.creadoEN = creadoEN;
 	}
 	
+	public Propiedad() {
+		
+	}
+	
 	public interface PropiedadRepository extends JpaRepository<Propiedad, Long> {
 	}
 	

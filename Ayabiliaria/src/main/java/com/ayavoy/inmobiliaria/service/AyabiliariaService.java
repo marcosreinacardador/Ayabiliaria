@@ -11,4 +11,9 @@ public interface AyabiliariaService {
 	Iterable<Cliente> consultarTodosClientes();
 	Iterable<Propiedad> consultarTodasPropiedades();
 	
+	// damos de alta un nuevo cliente y nos devuelve el cliente ademas con la fecha
+	Cliente altaClienteService(Cliente cliente);
+	
+	// damos de alta una nueva propiedad y nos devuelve con la foto y la fecha, además tiene que existir el cliente
+	Propiedad altaPropiedadService(Propiedad propiedad);
 }

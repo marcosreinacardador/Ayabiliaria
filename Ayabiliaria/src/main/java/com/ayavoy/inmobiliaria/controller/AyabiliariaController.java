@@ -112,20 +112,112 @@ public class AyabiliariaController {
 		return new ResponseEntity<>(propiedad, HttpStatus.OK);
 	}
 	
-//	GET -> consultar TODOS los clientes GET http://localhost:8081/listarClientes
-	@GetMapping
+//	GET -> consultar TODOS los clientes GET http://localhost:8081/ayabiliaria/listarClientes
+	@GetMapping("/listarClientes")
 	public ResponseEntity<?> listarClientes() {
-
+		
+		System.out.println("Llamando a listarClientes");
+		
 		ResponseEntity<?> responseEntity = null; // representa el mensaje http y devuelve cualquier cosa
 		Iterable<Cliente> lista_clientes = null; // con iterable nos da la lista que llama que es servicio
 
 		logger.debug("Atendido por el puerto " + environment.getProperty("local.server.port"));
-		lista_clientes = this.ayabiliariaService.consultarTodosClientes(); // dame la listaq de clientes y me da el servicio
+		lista_clientes = this.ayabiliariaService.consultarTodosClientes(); // dame la lista de clientes y me da el servicio
 		responseEntity = ResponseEntity.ok(lista_clientes); // con esto estamos construyendo el objeto de vuelta que
 																// es responseEntity
-		// logger.info("Si, he acabado de listar todos los clientes.");
+		logger.info("Si, he acabado de listar todos los clientes.");
+		
 		return responseEntity;
 	}
 	
+//	GET -> consultar TODOS las propiedades GET http://localhost:8081/ayabiliaria/listarPropiedades
+	@GetMapping("/listarPropiedades")
+	public ResponseEntity<?> listarPropiedades() {
+		
+		System.out.println("Llamando a listarPropiedades");
+		
+		ResponseEntity<?> responseEntity = null; // representa el mensaje http y devuelve cualquier cosa
+		Iterable<Propiedad> lista_propiedades = null; // con iterable nos da la lista que llama que es servicio
+
+		logger.debug("Atendido por el puerto " + environment.getProperty("local.server.port"));
+		lista_propiedades = this.ayabiliariaService.consultarTodasPropiedades(); // dame la lista depropiedades y clientes, me da el servicio
+		responseEntity = ResponseEntity.ok(lista_propiedades); // con esto estamos construyendo el objeto de vuelta que
+																// es responseEntity
+		logger.info("Si, he acabado de listar todos las propiedades.");
+		
+		return responseEntity;
+	}
 	
+	// Dar de alta a un cliente propietario en la inmobiliaria
+
+		@PostMapping("/altaCliente") // POST localhost:8081/ayabiliaria/altaCliente
+		public ResponseEntity<?> altaCliente(@Valid Cliente cliente, BindingResult bindingResult) throws IOException { // quitamos el @ResquestBody añadimos multiPartFile archivo
+
+			ResponseEntity<?> responseEntity = null; // representa el mensaje http y devuelve cualquier cosa
+			Cliente clienteNuevo = null;
+
+			// TODO validar
+			if (bindingResult.hasErrors()) {
+				logger.debug("Errores en la entrada POST");
+				responseEntity = generarRespuestaErroresValidacion(bindingResult);
+			} else {
+				logger.debug("Sin errores en la entrada POST");
+			}
+
+				clienteNuevo = this.ayabiliariaService.altaClienteService(cliente);
+				responseEntity = ResponseEntity.status(HttpStatus.CREATED).body(clienteNuevo); // 201 es porque se ha creado OK
+																									
+			return responseEntity;
+		}
+		
+		// TODO  1 Dar de alta una propiedad con foto
+		// TODO  2 Debe de controlar que exista el cliente, en caso contrario que permita darlo de alta ¿?
+		// Dar de alta una propiedad con foto, y que exista el cliente
+
+		@PostMapping("/altaPropiedad") // POST localhost:8081/ayabiliaria/altaPropiedad
+		public ResponseEntity<?> altaPropiedad(@Valid Propiedad propiedad, BindingResult bindingResult,
+				MultipartFile archivo) throws IOException { // quitamos el @ResquestBody añadimos multiPartFile archivo
+
+			ResponseEntity<?> responseEntity = null; // representa el mensaje http y devuelve cualquier cosa
+			Propiedad propiedadNueva = null;
+
+			// TODO validar
+			if (bindingResult.hasErrors()) {
+				logger.debug("Errores en la entrada POST");
+				responseEntity = generarRespuestaErroresValidacion(bindingResult);
+			} else {
+				logger.debug("Sin errores en la entrada POST");
+
+				if (!archivo.isEmpty()) {
+					logger.debug("Restaurante trae foto");
+					try {
+						propiedad.setFoto(archivo.getBytes());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						logger.debug("Error al tratar la foto", e);
+						throw e; // lanzo la excepción
+					}
+				}
+
+				propiedadNueva = this.ayabiliariaService.altaPropiedadService(propiedad);
+				responseEntity = ResponseEntity.status(HttpStatus.CREATED).body(propiedadNueva); // 201 es porque se ha
+																									// creado
+			}
+			return responseEntity;
+		}
+	
+		private ResponseEntity<?> generarRespuestaErroresValidacion(BindingResult bindingResult) {
+
+			ResponseEntity<?> responseEntity = null;
+			List<ObjectError> listaErrores = null;
+
+			listaErrores = bindingResult.getAllErrors();
+			// vamos a imprimir los errores por el log
+			listaErrores.forEach(e -> logger.error(e.toString()));
+			responseEntity = ResponseEntity.status(HttpStatus.BAD_REQUEST).body(listaErrores);
+
+			return responseEntity;
+		}
+		
 }

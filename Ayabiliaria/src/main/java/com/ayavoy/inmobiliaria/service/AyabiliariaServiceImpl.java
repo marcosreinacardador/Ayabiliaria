@@ -20,22 +20,36 @@ public class AyabiliariaServiceImpl implements AyabiliariaService {
 	@Autowired  //have falta inyectar
 	PropiedadRepository propiedadRepository;   //instancia de la base de datos
 
+	// Listar todos los clientes dados de alta en Ayabiliaria.
 	@Override
 	//utilizamos el de spring y no el de Tomcat, permitimos acceso concurrente a a la tabla Clientes
 	@Transactional(readOnly = true)
 	public Iterable<Cliente> consultarTodosClientes() {
-		Iterable<Cliente> lista_clientes = null;
-		//le pido todos los clientes a la base de datos cliente
-		//y le devuelvo todos los clientes con iterable findAll()
-		lista_clientes = this.clienteRepository.listaClientes();
-		return lista_clientes;
+		return this.clienteRepository.findAll();
 	}
 
+	// Listar todas las propiedades incluidos los clientes que es de cada una
 	@Override
 	//utilizamos el de spring y no el de Tomcat, permitimos acceso concurrente a a la tabla Propiedad
 	@Transactional(readOnly = true)
 	public Iterable<Propiedad> consultarTodasPropiedades() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.propiedadRepository.findAll();
 	}
+	
+	// Dar de alta a un cliente nuevo
+	@Override
+	@Transactional   //utilizamos el de spring y no el de Tomcat
+	public Cliente altaClienteService(Cliente cliente) {
+		return this.clienteRepository.save(cliente);
+		//return null;
+	}
+	
+	// Dar de alta a una propiedad nueva
+		@Override
+		@Transactional   //utilizamos el de spring y no el de Tomcat
+		public Propiedad altaPropiedadService(Propiedad propiedad) {
+			return this.propiedadRepository.save(propiedad);
+			//return null;
+		}
+	
 }
