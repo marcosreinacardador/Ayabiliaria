@@ -11,16 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 //import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,14 +24,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ayavoy.inmobiliaria.repository.entity.Cliente;
 import com.ayavoy.inmobiliaria.repository.entity.Cliente.ClienteRepository;
 import com.ayavoy.inmobiliaria.repository.entity.Propiedad;
-import com.ayavoy.inmobiliaria.repository.entity.Propiedad.PropiedadRepository;
+
 import com.ayavoy.inmobiliaria.service.AyabiliariaService;
 /**
  * 
@@ -49,8 +44,8 @@ import com.ayavoy.inmobiliaria.service.AyabiliariaService;
  * POST -> insertar un propietario nuevo
  * POST -> insertar una propiedad nueva
  * PUT  -> modificación ¿?
- * DELETE -> elimina ¿? 
- * GET -> Búsqueda -> ¿?
+ * PUT  -> cambia estado ¿?
+ * GET 	-> Búsqueda -> ¿?
  */
 
 
@@ -64,6 +59,7 @@ public class AyabiliariaController {
 	@Autowired
 	AyabiliariaService ayabiliariaService;  //viene llamado desde AyabiliariaServiceImple
 	
+	 
 	@Autowired
 	Environment environment; // de aqui voy asacar la instancia del puerto
 	
@@ -93,7 +89,7 @@ public class AyabiliariaController {
 	public ResponseEntity<Propiedad> obtenerPropiedadTest() {
 		
 		Cliente cliente = new Cliente();
-		cliente.setDni("30445332X"); // Establece otros atributos de Cliente si es necesario
+		cliente.setDni("34567890X"); // Establece otros atributos de Cliente si es necesario
 		
 		System.out.println("Llamando a obtenerPropiedadTest");
 		logger.debug("estoy en obtenerPropiedadTest");
@@ -101,6 +97,7 @@ public class AyabiliariaController {
 								  cliente,
 								  "Piso", 
 								  "Venta", 
+								  0,
 								  "C/ Capricho, 15", 
 								  "Fuengirola", 
 								  "Málaga", 
@@ -199,14 +196,47 @@ public class AyabiliariaController {
 						throw e; // lanzo la excepción
 					}
 				}
-
+				
+				propiedadNueva.setEstado(0);
 				propiedadNueva = this.ayabiliariaService.altaPropiedadService(propiedad);
 				responseEntity = ResponseEntity.status(HttpStatus.CREATED).body(propiedadNueva); // 201 es porque se ha
 																									// creado
 			}
 			return responseEntity;
 		}
-	
+		
+		// PUT -> modificar un cliente que ya existe  http://localhost:8081/ayabiliaria/modificaCliente(Body cliente)
+		// como ejemplo en postman:  http://localhost:8081/ayabiliaria/modificaCliente/30445332X
+		@PutMapping("/modificaCliente/{dni}")
+	    public ResponseEntity<Cliente> modificarCliente(@PathVariable String dni, @RequestBody Cliente clienteModificado) {
+	        Cliente clienteActualizado = ayabiliariaService.modificarClienteService(dni, clienteModificado);
+
+	        if (clienteActualizado != null) {
+	        	System.out.println("Cliente modificado correctamente " + clienteActualizado);
+	            return ResponseEntity.ok(clienteActualizado);
+	        } else {
+	        	System.out.println("Me da error" +  dni + clienteActualizado);
+	            return ResponseEntity.notFound().build();
+	        }
+	    }
+		
+		// PUT -> modificar una propiedad que ya exista  http://localhost:8081/ayabiliaria/modificarPropiedad(Body cliente)
+		// como ejemplo en postman:  http://localhost:8081/ayabiliaria/modificarPropiedad/30445332X
+		@PutMapping("/modificarPropiedad/{numeroReferencia}")
+	    public ResponseEntity<Propiedad> modificarPropiedad(@PathVariable long numeroReferencia, BindingResult bindingResult, @Valid Propiedad propiedadModificada, MultipartFile archivo) {
+	        Propiedad propiedadActualizada = ayabiliariaService.modificarPropiedadService(numeroReferencia, propiedadModificada);
+
+	        if (propiedadActualizada != null) {
+	        	System.out.println("Propiedad modificada correctamente " + propiedadActualizada);
+	            return ResponseEntity.ok(propiedadActualizada);
+	        } else {
+	        	System.out.println("Me da error" +  numeroReferencia + propiedadActualizada);
+	            return ResponseEntity.notFound().build();
+	        }
+	    }
+
+		
+		// Controlar los errorres y los imprime en el log
 		private ResponseEntity<?> generarRespuestaErroresValidacion(BindingResult bindingResult) {
 
 			ResponseEntity<?> responseEntity = null;

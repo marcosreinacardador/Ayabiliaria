@@ -104,7 +104,10 @@ public class Cliente {
 
 
 	public interface ClienteRepository extends JpaRepository<Cliente, String> {
+		
 	}
+
+	
 	
 	
 }

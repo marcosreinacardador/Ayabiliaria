@@ -2,10 +2,13 @@ package com.ayavoy.inmobiliaria.repository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.stereotype.Repository;
 
 import com.ayavoy.inmobiliaria.repository.entity.Cliente;
 import com.ayavoy.inmobiliaria.repository.entity.Propiedad;
 
+
+@Repository
 public interface ClienteRepository extends PagingAndSortingRepository<Cliente, String>{
 
 //	Haced un servicio web que devuelva todos los clientes de la base de datos Ayabiliaria :)
@@ -13,7 +16,9 @@ public interface ClienteRepository extends PagingAndSortingRepository<Cliente, S
 	@Query(value = "Select * from cliente;", nativeQuery = true)
 	Iterable<Cliente> listaClientes();
 
+	Cliente findByDni(String dni);
 
+	
 	
 	
 }

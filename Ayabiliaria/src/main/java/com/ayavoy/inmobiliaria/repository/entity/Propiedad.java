@@ -31,6 +31,7 @@ public class Propiedad {
 
     private String tipoPropiedad;
     private String operacion;
+    private int estado;
     private String direccion;
     private String localidad;
     private String poblacion;
@@ -116,6 +117,14 @@ public class Propiedad {
 	public void setFoto(byte[] foto) {
 		this.foto = foto;
 	}
+	
+	public int getEstado() {
+		return estado;
+	}
+	
+	public void setEstado(int estado) {
+		this.estado = estado;
+	}
 	@PrePersist // este metodo, marcado así, se ejecuta antes de insertar el restaurante
 	private void generarFechaCreacion () 
 	{
@@ -139,6 +148,7 @@ public class Propiedad {
 	 * @param string
 	 * @param tipoPropiedad
 	 * @param operacion
+	 * @param estado
 	 * @param direccion
 	 * @param localidad
 	 * @param poblacion
@@ -146,7 +156,7 @@ public class Propiedad {
 	 * @param total
 	 * @param descripcion
 	 */
-	public Propiedad(long numeroReferencia, Cliente cliente, String tipoPropiedad, String operacion,
+	public Propiedad(long numeroReferencia, Cliente cliente, String tipoPropiedad, String operacion, int estado,
 			String direccion, String localidad, String poblacion, String codigoPostal, int total,
 			String descripcion, LocalDateTime creadoEN) {
 		super();
@@ -154,6 +164,7 @@ public class Propiedad {
 		this.cliente = cliente;
 		this.tipoPropiedad = tipoPropiedad;
 		this.operacion = operacion;
+		this.estado = estado;
 		this.direccion = direccion;
 		this.localidad = localidad;
 		this.poblacion = poblacion;

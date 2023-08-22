@@ -1,5 +1,7 @@
 package com.ayavoy.inmobiliaria.service;
 
+import java.util.Optional;
+
 import com.ayavoy.inmobiliaria.repository.entity.Cliente;
 import com.ayavoy.inmobiliaria.repository.entity.Propiedad;
 
@@ -16,4 +18,13 @@ public interface AyabiliariaService {
 	
 	// damos de alta una nueva propiedad y nos devuelve con la foto y la fecha, además tiene que existir el cliente
 	Propiedad altaPropiedadService(Propiedad propiedad);
+	
+	// cogemos el dni y los datos del
+	// cliente y nos devuelve si
+	// existe o no con optional al igual
+	// que la consulta.
+	Cliente modificarClienteService(String dni, Cliente cliente);
+
+	Propiedad modificarPropiedadService(Long numeroReferencia, Propiedad propiedad);
+	
 }
