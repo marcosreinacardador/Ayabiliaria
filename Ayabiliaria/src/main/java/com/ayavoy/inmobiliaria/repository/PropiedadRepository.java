@@ -13,5 +13,4 @@ public interface PropiedadRepository extends PagingAndSortingRepository<Propieda
 	@Query(value = "Select * from propiedad;", nativeQuery = true)
 	Iterable<Propiedad> listaPropiedades();
 	
-	Propiedad findByNumRef(Long numeroReferencia);
 }

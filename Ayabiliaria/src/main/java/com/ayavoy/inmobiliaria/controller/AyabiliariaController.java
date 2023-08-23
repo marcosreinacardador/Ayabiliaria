@@ -221,19 +221,44 @@ public class AyabiliariaController {
 	    }
 		
 		// PUT -> modificar una propiedad que ya exista  http://localhost:8081/ayabiliaria/modificarPropiedad(Body cliente)
-		// como ejemplo en postman:  http://localhost:8081/ayabiliaria/modificarPropiedad/30445332X
+		// como ejemplo en postman:  http://localhost:8081/ayabiliaria/modificarPropiedad/1
 		@PutMapping("/modificarPropiedad/{numeroReferencia}")
-	    public ResponseEntity<Propiedad> modificarPropiedad(@PathVariable long numeroReferencia, BindingResult bindingResult, @Valid Propiedad propiedadModificada, MultipartFile archivo) {
-	        Propiedad propiedadActualizada = ayabiliariaService.modificarPropiedadService(numeroReferencia, propiedadModificada);
+		public ResponseEntity<?> modificaPropiedad(@Valid Propiedad propiedad,
+				BindingResult bindingResult, MultipartFile archivo, @PathVariable Long numeroReferencia) throws IOException  { // deserializa por recibir un texto
 
-	        if (propiedadActualizada != null) {
-	        	System.out.println("Propiedad modificada correctamente " + propiedadActualizada);
-	            return ResponseEntity.ok(propiedadActualizada);
-	        } else {
-	        	System.out.println("Me da error" +  numeroReferencia + propiedadActualizada);
-	            return ResponseEntity.notFound().build();
-	        }
-	    }
+			ResponseEntity<?> responseEntity = null; // representa el mensaje http y devuelve cualquier cosa
+			Optional<Propiedad> opPropiedad = null;
+
+			// TODO validar
+			if (bindingResult.hasErrors()) {
+				logger.debug("Errores en la entrada PUT");
+				responseEntity = generarRespuestaErroresValidacion(bindingResult);
+			} else {
+				logger.debug("Sin errores en la entrada PUT");
+				
+				if(!archivo.isEmpty()) {
+					try {
+						propiedad.setFoto(archivo.getBytes());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						logger.error("Error al tratar la foto", e);
+						throw e;
+					}
+				}
+				
+				opPropiedad = this.ayabiliariaService.modificaPropiedadService(numeroReferencia, propiedad);
+				if (opPropiedad.isPresent()) {
+					Propiedad pr = opPropiedad.get();
+					responseEntity = ResponseEntity.ok(pr); // 200 esta correcto
+				} else {
+					responseEntity = ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 not found error del cliente
+				}
+			}
+			return responseEntity;
+
+		}
+
 
 		
 		// Controlar los errorres y los imprime en el log

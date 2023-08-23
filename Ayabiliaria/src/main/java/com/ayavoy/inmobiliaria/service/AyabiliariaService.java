@@ -25,6 +25,6 @@ public interface AyabiliariaService {
 	// que la consulta.
 	Cliente modificarClienteService(String dni, Cliente cliente);
 
-	Propiedad modificarPropiedadService(Long numeroReferencia, Propiedad propiedad);
+	Optional<Propiedad> modificaPropiedadService(Long numeroReferencia, Propiedad propiedad);
 	
 }

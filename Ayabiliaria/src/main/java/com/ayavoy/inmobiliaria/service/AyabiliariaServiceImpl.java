@@ -1,5 +1,7 @@
 package com.ayavoy.inmobiliaria.service;
 
+import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
@@ -57,7 +59,8 @@ public class AyabiliariaServiceImpl implements AyabiliariaService {
 		//return null;
 	}
 	
-	
+	@Override
+	@Transactional
 	public Cliente modificarClienteService(String dni, Cliente clienteModificado) {
         Cliente clienteExistente = clienteRepository.findByDni(dni);
 
@@ -76,9 +79,9 @@ public class AyabiliariaServiceImpl implements AyabiliariaService {
 	        return null; // Manejar caso en el que el cliente no existe
 	}
 	
-
-	public Propiedad modificarPropiedadService(Long numeroReferencia, Propiedad propiedadModificada) {
-		Propiedad propiedadExistente = propiedadRepository.findByNumRef(numeroReferencia);
+/*
+	public Optional<Propiedad> modificarPropiedadService(Long numeroReferencia, Propiedad propiedadModificada) {
+		Optional<Propiedad> propiedadExistente = propiedadRepository.findById(numeroReferencia);
 
 		if (propiedadExistente != null) {
 		    // Actualiza los atributos del cliente existente con los valores del clienteModificado
@@ -91,6 +94,7 @@ public class AyabiliariaServiceImpl implements AyabiliariaService {
 			propiedadExistente.setCodigoPostal(propiedadModificada.getCodigoPostal());
 			propiedadExistente.setTotal(propiedadModificada.getTotal());
 			propiedadExistente.setDescripcion(propiedadModificada.getDescripcion());
+			propiedadExistente.setFoto(propiedadModificada.getFoto());
 		  
 		
 		    return propiedadRepository.save(propiedadExistente);
@@ -98,6 +102,34 @@ public class AyabiliariaServiceImpl implements AyabiliariaService {
 			System.out.println("Propiedad con Número referencia: " + numeroReferencia + " no existe.");
 		    return null; // Manejar caso en el que el cliente no existe
 		}
+*/
+	@Override
+	@Transactional   //utilizamos el de spring y no el de Tomcat
+	public Optional<Propiedad> modificaPropiedadService(Long numeroReferencia, Propiedad propiedad) {
+		Optional<Propiedad> opProp = Optional.empty();
+		// 1 LEER
+		opProp =  this.propiedadRepository.findById(numeroReferencia);
+			if(opProp.isPresent()) {  // lo has encontrado si?
+				// Al estar dentro de una transaccion, propiedadLeida está asociado a un registro de la tabla.
+				// Si modifico un campo, estoy modificando la columna asociada (Estado "Persistent" - JPA)
+ 				Propiedad propiedadLeida  = opProp.get();
+ 				
+ 				// Guardar el valor actual de creadoEn sino hago esto me mete null al actualizarlo
+ 				LocalDateTime creadoEnOriginal = propiedadLeida.getCreadoEN();
+
+ 				//restauranteLeido.setNombre(restaurante.getNombre()); en vez de hacerlo uno a uno por campo lo hacemos con BeanUtils.copyProperties
+ 				BeanUtils.copyProperties(propiedad, propiedadLeida, "NumeroReferencia", "creadoEN", "cliente");   // copiame todos los atributos de propiedadLeia a propiedad, menos numeroReferencia y creadoEn
+ 				
+ 				// Restaurar el valor original de creadoEn
+ 				propiedadLeida.setCreadoEN(creadoEnOriginal);
+
+ 				opProp = Optional.of(propiedadRepository.save(propiedadLeida)); //Rellenamos el Optional
+			}
+		// 2 ACTUALIZAR
+		return opProp;
+	}
+
+	
 	}
 
 
