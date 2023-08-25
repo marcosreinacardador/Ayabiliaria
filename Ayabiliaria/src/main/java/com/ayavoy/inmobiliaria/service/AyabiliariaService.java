@@ -1,6 +1,10 @@
 package com.ayavoy.inmobiliaria.service;
 
+
 import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.ayavoy.inmobiliaria.repository.entity.Cliente;
 import com.ayavoy.inmobiliaria.repository.entity.Propiedad;
@@ -11,6 +15,9 @@ public interface AyabiliariaService {
 	// AyabiliariaServiceImpl, habrá que add este iterable
 	// Iterable lo que hace es recorrer
 	Iterable<Cliente> consultarTodosClientes();
+	//listar todos los clientes, pero devuelvo una pagina un page de clientes
+	Page<Cliente> consultarPorPaginas(Pageable pageable);
+	
 	Iterable<Propiedad> consultarTodasPropiedades();
 	
 	// damos de alta un nuevo cliente y nos devuelve el cliente ademas con la fecha

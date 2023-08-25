@@ -1,5 +1,6 @@
 package com.ayavoy.inmobiliaria.controller;
 
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -124,6 +126,22 @@ public class AyabiliariaController {
 																// es responseEntity
 		logger.info("Si, he acabado de listar todos los clientes.");
 		
+		return responseEntity;
+	}
+	
+//	GET -> consultar TODOS GET http://localhost:8081/restaurante/pagina?page=0&size=2
+	@GetMapping("/pagina")
+	public ResponseEntity<?> listadoDeClientesPorPagina(Pageable pageable) {
+
+		ResponseEntity<?> responseEntity = null; // representa el mensaje http y devuelve cualquier cosa
+		Iterable<Cliente> pagina_clientes = null; // con iterable nos da la lista que llama que es servicio
+
+		logger.debug("Atendido por el puerto " + environment.getProperty("local.server.port"));
+		pagina_clientes = this.ayabiliariaService.consultarPorPaginas(pageable); // dame la lista de clientes y
+																						// me da el servicio
+		responseEntity = ResponseEntity.ok(pagina_clientes); // con esto estamos construyendo el objeto de vuelta
+																	// que es responseEntity
+		// logger.info("Si acabo de listar todos los registros.");
 		return responseEntity;
 	}
 	

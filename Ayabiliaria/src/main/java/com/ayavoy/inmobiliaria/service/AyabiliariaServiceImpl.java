@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,14 @@ public class AyabiliariaServiceImpl implements AyabiliariaService {
 	@Transactional(readOnly = true)
 	public Iterable<Cliente> consultarTodosClientes() {
 		return this.clienteRepository.findAll();
+	}
+	
+	// con paginación listados de clientes
+	@Override
+	@Transactional(readOnly = true)
+	public Page<Cliente> consultarPorPaginas(Pageable pageable){
+		return this.clienteRepository.findAll(pageable);
+		
 	}
 
 	// Listar todas las propiedades incluidos los clientes que es de cada una
